@@ -11,7 +11,7 @@
             --accent: #00e5ff; 
             --glass: rgba(0, 15, 20, 0.9); 
             --bg: #030508;
-            --rail-w: 70px; /* Narrowed slightly for better proportions */
+            --rail-w: 70px;
             --red: #ff4444;
         }
 
@@ -36,17 +36,17 @@
             z-index: 100;
             overflow-x: hidden;
             overflow-y: auto;
-            scrollbar-width: none; /* Hide scrollbar Firefox */
+            scrollbar-width: none;
         }
 
-        .side-rail::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+        .side-rail::-webkit-scrollbar { display: none; }
         .side-rail:hover { width: 260px; }
 
         .cell {
             width: 100%;
             display: flex;
             align-items: center;
-            padding: 10px 0; /* Reduced padding from 14px */
+            padding: 10px 0;
             color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
             transition: 0.2s;
@@ -59,83 +59,21 @@
             border-left: 2px solid var(--accent);
         }
 
-        /* --- USER PROFILE CARD --- */
-        .user-profile {
-            margin-top: auto;
-            padding: 12px 15px;
-            display: flex;
-            align-items: center;
-            border-top: 1px solid rgba(0, 229, 255, 0.1);
-            background: rgba(0, 229, 255, 0.02);
-        }
-
-        .avatar-wrapper {
-            position: relative;
-            min-width: 35px; /* Smaller avatar */
-            height: 35px;
-        }
-
-        .user-avatar {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            border: 1.5px solid var(--accent);
-            object-fit: cover;
-            box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
-        }
-
-        .user-info {
-            margin-left: 12px;
-            white-space: nowrap;
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .side-rail:hover .user-info { opacity: 1; }
-
-        .user-name {
-            display: block;
-            font-size: 0.7rem; /* Smaller Font */
-            font-weight: 600;
-            color: var(--accent);
-            letter-spacing: 0.5px;
-        }
-
-        .user-status {
-            font-size: 0.55rem;
-            color: rgba(255,255,255,0.4);
-            text-transform: uppercase;
-        }
-
-        /* Special Styling for Logout */
-        .logout-cell {
-            border-top: 1px solid rgba(255, 68, 68, 0.1);
-            margin-top: 0;
-            padding: 12px 0;
-        }
-
-        .logout-cell:hover {
-            background: rgba(255, 68, 68, 0.1) !important;
-            border-left: 2px solid var(--red) !important;
-            color: var(--red) !important;
-        }
-
         .icon {
             min-width: var(--rail-w);
             text-align: center;
-            font-size: 1.1rem; /* Smaller icons */
+            font-size: 1.1rem;
             filter: grayscale(100%) brightness(1.2);
             transition: 0.2s;
         }
 
         .cell:hover .icon { filter: grayscale(0%) drop-shadow(0 0 5px var(--accent)); }
-        .logout-cell:hover .icon { filter: none !important; drop-shadow: 0 0 5px var(--red); }
 
         .label {
             white-space: nowrap;
             opacity: 0;
-            font-size: 0.65rem; /* Shrunk from 0.75rem */
-            font-family: 'JetBrains Mono', monospace; /* Professional Mono look */
+            font-size: 0.65rem;
+            font-family: 'JetBrains Mono', monospace;
             font-weight: 400;
             letter-spacing: 1px;
             text-transform: uppercase;
@@ -161,6 +99,78 @@
             border-bottom: 1px solid rgba(0, 229, 255, 0.1);
         }
 
+        /* --- HEADER USER SECTION --- */
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .user-block {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding-right: 20px;
+            border-right: 1px solid rgba(0, 229, 255, 0.2);
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-name {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+            line-height: 1;
+        }
+
+        .user-status {
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 1.5px solid var(--accent);
+            object-fit: cover;
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+        }
+
+        .logout-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px; /* Slightly tighter gap */
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: 0.3s;
+    padding: 5px 8px;
+    border-radius: 4px;
+}
+
+.logout-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; /* Reduced from 0.6rem to 10px */
+    letter-spacing: 2px; /* Increased tracking for readability at small size */
+    font-weight: 300;
+    opacity: 0.8;
+}
+
+.logout-btn i {
+    font-size: 12px; /* Makes the power icon match the text height */
+}
+
+.logout-btn:hover {
+    color: var(--red);
+    background: rgba(255, 68, 68, 0.05); /* Subtle glow effect on hover */
+    text-shadow: 0 0 8px var(--red);
+}
+
         .status-footer {
             padding: 12px 15px;
             background: rgba(0, 0, 0, 0.5);
@@ -169,6 +179,7 @@
             font-size: 9px;
             color: var(--accent);
             letter-spacing: 1px;
+            margin-top: auto;
         }
 
         #desc-display { opacity: 0.7; }
@@ -190,20 +201,6 @@
         <div class="cell" data-desc="Pending Requests & Sign-off Queue" onmouseover="updateStatus(this)" onclick="nav('approval', this)"><div class="icon">✅🖋️</div><div class="label">FOR APPROVAL</div></div>
         <div class="cell" data-desc="Turnover Rate & Exit Monitoring" onmouseover="updateStatus(this)" onclick="nav('attrition', this)"><div class="icon">👤➡️</div><div class="label">ATTRITION</div></div>
 
-        <div class="user-profile">
-            <div class="avatar-wrapper">
-                <img src="https://via.placeholder.com/40" id="userAvatar" class="user-avatar" alt="User">
-            </div>
-            <div class="user-info">
-                <span class="user-name" id="userName">GUEST USER</span>
-                <span class="user-status">Secured Session</span>
-            </div>
-        </div>
-
-        <div class="cell logout-cell" data-desc="Terminate Secure Session & Clear Cache" onmouseover="updateStatus(this)" onclick="initiateLogout()">
-            <div class="icon">⏻</div><div class="label">TERMINATE SESSION</div>
-        </div>
-
         <div class="status-footer">
             SYS_LOG: <span id="desc-display">AWAITING INPUT...</span>
         </div>
@@ -212,7 +209,21 @@
     <div class="main-container">
         <header>
             <div style="font-weight: 800; letter-spacing: 2px;">HR TACTICAL <span style="color:var(--accent)">OS</span></div>
-            <div id="clock" style="font-family: 'JetBrains Mono'; color: var(--accent);">00:00:00</div>
+            
+            <div class="header-controls">
+                <div class="user-block">
+                    <div class="user-info">
+                        <span class="user-name" id="userName">GUEST USER</span>
+                        <span class="user-status"></span>
+                    </div>
+                    <img src="https://via.placeholder.com/40" id="userAvatar" class="user-avatar" alt="User">
+                </div>
+                <div id="clock" style="font-family: 'JetBrains Mono'; color: var(--accent); min-width: 85px;">00:00:00</div>
+                <div class="logout-btn" onclick="initiateLogout()" title="Terminate Session">
+    <span class="logout-text">Logout</span>
+    <i class="fa-solid fa-power-off"></i>
+                </div>
+            </div>
         </header>
 
         <div id="content-area" style="margin-top:40px; text-align:center; opacity:0.5;">
@@ -225,8 +236,17 @@
         window.onload = () => {
             const storedName = sessionStorage.getItem('userName');
             const storedPhoto = sessionStorage.getItem('userPhoto');
-            if(storedName) document.getElementById('userName').innerText = storedName.toUpperCase();
-            if(storedPhoto && storedPhoto !== "") document.getElementById('userAvatar').src = storedPhoto;
+
+            if (storedName) {
+                document.getElementById('userName').innerText = storedName.toUpperCase();
+            }
+
+            if (storedPhoto && storedPhoto !== "" && storedPhoto !== "undefined") {
+                document.getElementById('userAvatar').src = storedPhoto;
+            } else {
+                document.getElementById('userAvatar').src = "https://ui-avatars.com/api/?name=" + (storedName || "User") + "&background=00e5ff&color=000";
+            }
+            
             speak("Interface active.");
         };
 
@@ -249,7 +269,11 @@
         function initiateLogout() {
             speak("Terminating session.");
             const contentArea = document.getElementById('content-area');
-            contentArea.innerHTML = `<div style="text-align:center; margin-top:100px; color:var(--red);"><i class="fa-solid fa-power-off fa-fade" style="font-size: 3rem;"></i><h2 style="letter-spacing:4px; margin-top:20px;">SESSION TERMINATED</h2></div>`;
+            contentArea.innerHTML = `
+                <div style="text-align:center; margin-top:100px; color:var(--red);">
+                    <i class="fa-solid fa-power-off fa-fade" style="font-size: 3rem;"></i>
+                    <h2 style="letter-spacing:4px; margin-top:20px;">SESSION TERMINATED</h2>
+                </div>`;
             sessionStorage.clear();
             setTimeout(() => { window.location.href = "index.html"; }, 1500);
         }

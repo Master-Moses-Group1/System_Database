@@ -156,7 +156,6 @@
     window.speechSynthesis.speak(msg);
   }
 
-  // --- SHOW/HIDE PASSWORD LOGIC ---
   function toggleView() {
     const p = document.getElementById('pass');
     const icon = document.getElementById('eyeIcon');
@@ -171,7 +170,6 @@
   }
 
   function handleKeyPress(e) { if (e.keyCode === 13) { runAuth(); } }
-
   function closeModal() { document.getElementById('alertModal').style.display = 'none'; }
 
   function runAuth() {
@@ -203,25 +201,18 @@
   }
 
   function initiateSuccess(res) {
-    document.getElementById('mainCard').classList.add('auth-success');
-    document.getElementById('userName').innerText = res.identity;
-    document.getElementById('vettingFill').style.width = "100%";
-    
-    if(res.photoUrl) document.getElementById('user-photo').src = res.photoUrl;
+    // 1. Save to memory (Standard way)
+    sessionStorage.setItem('userName', res.identity);
+    sessionStorage.setItem('userPhoto', res.photoUrl || ""); 
 
-    speak("Identity confirmed. Initializing tactical terminal.");
+    speak("Identity confirmed.");
 
-    setTimeout(() => { document.getElementById('loadFill').style.width = "100%"; }, 100);
-
+    // 2. REDIRECT WITH DATA IN URL (The "Suitcase" way)
+    // This ensures that even if sessionStorage fails, the name arrives
     setTimeout(() => {
-      if (res.url) {
-        window.location.href = res.url;
-      } else {
-        document.getElementById('status-sub').innerText = "URL NOT FOUND";
-        speak("Warning. Redirection URL is missing.");
-      }
-    }, 4200); 
-  }
+        window.location.href = "dashboard.html?name=" + encodeURIComponent(res.identity) + "&photo=" + encodeURIComponent(res.photoUrl || ""); 
+    }, 3000); 
+}
 </script>
 </body>
 </html>
