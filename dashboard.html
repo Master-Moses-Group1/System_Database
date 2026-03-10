@@ -3,90 +3,262 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>System Dashboard | Command Center</title>
+    <title>HR TACTICAL SYSTEM | v4.0</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
     <style>
+        :root { 
+            --accent: #00e5ff; 
+            --glass: rgba(0, 15, 20, 0.9); 
+            --bg: #030508;
+            --rail-w: 70px; /* Narrowed slightly for better proportions */
+            --red: #ff4444;
+        }
+
         body {
-            background: #0a0a0a;
-            color: #00ff41;
-            font-family: 'Courier New', Courier, monospace;
+            background: var(--bg);
+            color: #fff;
+            font-family: 'Outfit', sans-serif;
             margin: 0;
             display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- TACTICAL SIDE RAIL --- */
+        .side-rail {
+            width: var(--rail-w);
+            background: rgba(0, 10, 15, 0.98);
+            border-right: 1px solid rgba(0, 229, 255, 0.2);
+            display: flex;
             flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
+            transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            overflow-x: hidden;
+            overflow-y: auto;
+            scrollbar-width: none; /* Hide scrollbar Firefox */
         }
-        .header {
+
+        .side-rail::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome/Safari */
+        .side-rail:hover { width: 260px; }
+
+        .cell {
             width: 100%;
-            padding: 20px;
-            border-bottom: 2px solid #00ff41;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 5px;
-            box-shadow: 0 0 15px #00ff41;
-        }
-        .container {
-            margin-top: 50px;
-            width: 80%;
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-        }
-        .card {
-            border: 1px solid #00ff41;
-            padding: 20px;
-            background: rgba(0, 255, 65, 0.05);
-            transition: 0.3s;
-        }
-        .card:hover {
-            background: rgba(0, 255, 65, 0.2);
-            box-shadow: 0 0 20px #00ff41;
-        }
-        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
-        .btn-logout {
-            margin-top: 50px;
-            padding: 10px 30px;
-            background: transparent;
-            color: #ff4141;
-            border: 1px solid #ff4141;
+            display: flex;
+            align-items: center;
+            padding: 10px 0; /* Reduced padding from 14px */
+            color: rgba(255, 255, 255, 0.6);
             cursor: pointer;
-            font-family: inherit;
+            transition: 0.2s;
+            border-left: 2px solid transparent;
         }
-        .btn-logout:hover { background: #ff4141; color: white; }
+
+        .cell:hover { 
+            background: rgba(0, 229, 255, 0.08); 
+            color: var(--accent);
+            border-left: 2px solid var(--accent);
+        }
+
+        /* --- USER PROFILE CARD --- */
+        .user-profile {
+            margin-top: auto;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+            background: rgba(0, 229, 255, 0.02);
+        }
+
+        .avatar-wrapper {
+            position: relative;
+            min-width: 35px; /* Smaller avatar */
+            height: 35px;
+        }
+
+        .user-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 1.5px solid var(--accent);
+            object-fit: cover;
+            box-shadow: 0 0 8px rgba(0, 229, 255, 0.3);
+        }
+
+        .user-info {
+            margin-left: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .side-rail:hover .user-info { opacity: 1; }
+
+        .user-name {
+            display: block;
+            font-size: 0.7rem; /* Smaller Font */
+            font-weight: 600;
+            color: var(--accent);
+            letter-spacing: 0.5px;
+        }
+
+        .user-status {
+            font-size: 0.55rem;
+            color: rgba(255,255,255,0.4);
+            text-transform: uppercase;
+        }
+
+        /* Special Styling for Logout */
+        .logout-cell {
+            border-top: 1px solid rgba(255, 68, 68, 0.1);
+            margin-top: 0;
+            padding: 12px 0;
+        }
+
+        .logout-cell:hover {
+            background: rgba(255, 68, 68, 0.1) !important;
+            border-left: 2px solid var(--red) !important;
+            color: var(--red) !important;
+        }
+
+        .icon {
+            min-width: var(--rail-w);
+            text-align: center;
+            font-size: 1.1rem; /* Smaller icons */
+            filter: grayscale(100%) brightness(1.2);
+            transition: 0.2s;
+        }
+
+        .cell:hover .icon { filter: grayscale(0%) drop-shadow(0 0 5px var(--accent)); }
+        .logout-cell:hover .icon { filter: none !important; drop-shadow: 0 0 5px var(--red); }
+
+        .label {
+            white-space: nowrap;
+            opacity: 0;
+            font-size: 0.65rem; /* Shrunk from 0.75rem */
+            font-family: 'JetBrains Mono', monospace; /* Professional Mono look */
+            font-weight: 400;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+        }
+
+        .side-rail:hover .label { opacity: 1; }
+
+        /* --- MAIN INTERFACE --- */
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 25px;
+            background: radial-gradient(circle at top right, rgba(0, 229, 255, 0.03), transparent);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0, 229, 255, 0.1);
+        }
+
+        .status-footer {
+            padding: 12px 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-top: 1px solid rgba(0, 229, 255, 0.1);
+            font-family: 'JetBrains Mono';
+            font-size: 9px;
+            color: var(--accent);
+            letter-spacing: 1px;
+        }
+
+        #desc-display { opacity: 0.7; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Control Panel | Level 4 Access</h1>
-    </div>
+    <nav class="side-rail">
+        <div class="cell" data-desc="Personnel Assignment & Role Management" onmouseover="updateStatus(this)" onclick="nav('plantilla', this)"><div class="icon">📋</div><div class="label">PLANTILLA</div></div>
+        <div class="cell" data-desc="Statistical Overview" onmouseover="updateStatus(this)" onclick="nav('p_summary', this)"><div class="icon">📊</div><div class="label">PLANTILLA SUMMARY</div></div>
+        <div class="cell" data-desc="Service Incentive Leave Tracking" onmouseover="updateStatus(this)" onclick="nav('s i l', this)"><div class="icon">🗓️</div><div class="label">S I L SYSTEM</div></div>
+        <div class="cell" data-desc="Internal Station & Personnel Rotation" onmouseover="updateStatus(this)" onclick="nav('reshuffle', this)"><div class="icon">🔄</div><div class="label">RESHUFFLE SYSTEM</div></div>
+        <div class="cell" data-desc="Identification & Code Authentication" onmouseover="updateStatus(this)" onclick="nav('vcode', this)"><div class="icon">🔑</div><div class="label">VCODE MASTERLIST</div></div>
+        <div class="cell" data-desc="Capacity Buffer & Surplus Calculations" onmouseover="updateStatus(this)" onclick="nav('buffer', this)"><div class="icon">🧮</div><div class="label">+5% BUFFER</div></div>
+        <div class="cell" data-desc="Open Position & Hiring Pipeline" onmouseover="updateStatus(this)" onclick="nav('vacancy_mon', this)"><div class="icon">🔭</div><div class="label">VACANCY MONITORING</div></div>
+        <div class="cell" data-desc="Human Resource Location Mapping" onmouseover="updateStatus(this)" onclick="nav('emploc_mon', this)"><div class="icon">👤</div><div class="label">HR EMPLOC MONITORING</div></div>
+        <div class="cell" data-desc="Validation Error & Delta Analysis" onmouseover="updateStatus(this)" onclick="nav('vcode_var', this)"><div class="icon">⚠️</div><div class="label">VCODE VARIANCE</div></div>
+        <div class="cell" data-desc="Personnel Termination Protocol" onmouseover="updateStatus(this)" onclick="nav('deactivation', this)"><div class="icon">🗑️</div><div class="label">FOR DEACTIVATION</div></div>
+        <div class="cell" data-desc="Pending Requests & Sign-off Queue" onmouseover="updateStatus(this)" onclick="nav('approval', this)"><div class="icon">✅🖋️</div><div class="label">FOR APPROVAL</div></div>
+        <div class="cell" data-desc="Turnover Rate & Exit Monitoring" onmouseover="updateStatus(this)" onclick="nav('attrition', this)"><div class="icon">👤➡️</div><div class="label">ATTRITION</div></div>
 
-    <div class="container">
-        <div class="card">
-            <h2>User Identity</h2>
-            <p id="user-display">Loading Identity...</p>
+        <div class="user-profile">
+            <div class="avatar-wrapper">
+                <img src="https://via.placeholder.com/40" id="userAvatar" class="user-avatar" alt="User">
+            </div>
+            <div class="user-info">
+                <span class="user-name" id="userName">GUEST USER</span>
+                <span class="user-status">Secured Session</span>
+            </div>
         </div>
-        <div class="card">
-            <h2>System Status</h2>
-            <p>● Online</p>
-            <p>● Encryption: Active</p>
+
+        <div class="cell logout-cell" data-desc="Terminate Secure Session & Clear Cache" onmouseover="updateStatus(this)" onclick="initiateLogout()">
+            <div class="icon">⏻</div><div class="label">TERMINATE SESSION</div>
         </div>
-        <div class="card">
-            <h2>Database Link</h2>
-            <p>Connected to: Google Sheets</p>
-            <p>Latencies: 14ms</p>
+
+        <div class="status-footer">
+            SYS_LOG: <span id="desc-display">AWAITING INPUT...</span>
+        </div>
+    </nav>
+
+    <div class="main-container">
+        <header>
+            <div style="font-weight: 800; letter-spacing: 2px;">HR TACTICAL <span style="color:var(--accent)">OS</span></div>
+            <div id="clock" style="font-family: 'JetBrains Mono'; color: var(--accent);">00:00:00</div>
+        </header>
+
+        <div id="content-area" style="margin-top:40px; text-align:center; opacity:0.5;">
+            <i class="fa-solid fa-terminal" style="font-size: 2.5rem; margin-bottom: 20px;"></i>
+            <p style="font-size: 0.8rem; letter-spacing: 1px;">SELECT MODULE FROM LEFT RAIL TO BEGIN DATA RETRIEVAL</p>
         </div>
     </div>
-
-    <button class="btn-logout" onclick="logout()">TERMINATE SESSION</button>
 
     <script>
-        // Get the name we sent in the URL during login
-        const urlParams = new URLSearchParams(window.location.search);
-        const userName = urlParams.get('user') || "Authorized User";
-        document.getElementById('user-display').innerText = "Welcome, " + userName;
+        window.onload = () => {
+            const storedName = sessionStorage.getItem('userName');
+            const storedPhoto = sessionStorage.getItem('userPhoto');
+            if(storedName) document.getElementById('userName').innerText = storedName.toUpperCase();
+            if(storedPhoto && storedPhoto !== "") document.getElementById('userAvatar').src = storedPhoto;
+            speak("Interface active.");
+        };
 
-        function logout() {
-            window.location.href = "index.html";
+        setInterval(() => {
+            document.getElementById('clock').innerText = new Date().toLocaleTimeString();
+        }, 1000);
+
+        function updateStatus(el) {
+            const desc = el.getAttribute('data-desc');
+            document.getElementById('desc-display').innerText = desc;
+        }
+
+        function nav(module, el) {
+            const label = el.querySelector('.label').innerText;
+            speak(`Accessing ${label}.`);
+            document.querySelectorAll('.cell').forEach(c => c.style.borderLeftColor = 'transparent');
+            el.style.borderLeftColor = 'var(--accent)';
+        }
+
+        function initiateLogout() {
+            speak("Terminating session.");
+            const contentArea = document.getElementById('content-area');
+            contentArea.innerHTML = `<div style="text-align:center; margin-top:100px; color:var(--red);"><i class="fa-solid fa-power-off fa-fade" style="font-size: 3rem;"></i><h2 style="letter-spacing:4px; margin-top:20px;">SESSION TERMINATED</h2></div>`;
+            sessionStorage.clear();
+            setTimeout(() => { window.location.href = "index.html"; }, 1500);
+        }
+
+        function speak(text) {
+            window.speechSynthesis.cancel();
+            const msg = new SpeechSynthesisUtterance(text);
+            msg.pitch = 1.2;
+            window.speechSynthesis.speak(msg);
         }
     </script>
 </body>
