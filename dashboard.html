@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Dashboard | Command Center</title>
+    <style>
+        body {
+            background: #0a0a0a;
+            color: #00ff41;
+            font-family: 'Courier New', Courier, monospace;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            width: 100%;
+            padding: 20px;
+            border-bottom: 2px solid #00ff41;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            box-shadow: 0 0 15px #00ff41;
+        }
+        .container {
+            margin-top: 50px;
+            width: 80%;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            border: 1px solid #00ff41;
+            padding: 20px;
+            background: rgba(0, 255, 65, 0.05);
+            transition: 0.3s;
+        }
+        .card:hover {
+            background: rgba(0, 255, 65, 0.2);
+            box-shadow: 0 0 20px #00ff41;
+        }
+        h2 { border-bottom: 1px solid #00ff41; padding-bottom: 10px; }
+        .btn-logout {
+            margin-top: 50px;
+            padding: 10px 30px;
+            background: transparent;
+            color: #ff4141;
+            border: 1px solid #ff4141;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-logout:hover { background: #ff4141; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>Control Panel | Level 4 Access</h1>
+    </div>
+
+    <div class="container">
+        <div class="card">
+            <h2>User Identity</h2>
+            <p id="user-display">Loading Identity...</p>
+        </div>
+        <div class="card">
+            <h2>System Status</h2>
+            <p>● Online</p>
+            <p>● Encryption: Active</p>
+        </div>
+        <div class="card">
+            <h2>Database Link</h2>
+            <p>Connected to: Google Sheets</p>
+            <p>Latencies: 14ms</p>
+        </div>
+    </div>
+
+    <button class="btn-logout" onclick="logout()">TERMINATE SESSION</button>
+
+    <script>
+        // Get the name we sent in the URL during login
+        const urlParams = new URLSearchParams(window.location.search);
+        const userName = urlParams.get('user') || "Authorized User";
+        document.getElementById('user-display').innerText = "Welcome, " + userName;
+
+        function logout() {
+            window.location.href = "index.html";
+        }
+    </script>
+</body>
+</html>
