@@ -3,7 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>TACTICAL TERMINAL</title>
+  <title>SYSTEM LOGIN</title>
+  
+  <link rel="icon" type="image/png" href="logo.png">
+
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
   <style>
@@ -27,6 +30,21 @@
       overflow: hidden; 
       padding: 20px;
       box-sizing: border-box;
+    }
+
+    /* --- BRANDING STYLE --- */
+    .brand-header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+
+    .login-logo {
+      height: 50px;
+      width: auto;
+      filter: drop-shadow(0 0 8px var(--accent));
     }
 
     /* --- ANIMATED BUTTERFLY BACKGROUND --- */
@@ -62,12 +80,11 @@
     .auth-success .identity-view { display: block; }
     .identity-view { display: none; }
 
-    h2 { font-weight: 800; letter-spacing: 3px; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 30px; color: var(--accent); }
+    h2 { font-weight: 800; letter-spacing: 3px; text-transform: uppercase; font-size: 0.85rem; margin: 0; color: var(--accent); }
     
     .input-group { position: relative; margin-bottom: 15px; }
     .input-group i.main-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); opacity: 0.7; }
     
-    /* Show Password Toggle Styling */
     .toggle-pass { 
       position: absolute; 
       right: 15px; 
@@ -113,7 +130,10 @@
 
   <div class="terminal-card" id="mainCard">
     <div class="login-view" id="loginView">
-      <h2><b>DATABASE SYSTEM ACCESS</b></h2>
+      
+      <div class="brand-header">
+        <h2><b>DATABASE SYSTEM ACCESS</b></h2>
+      </div>
       
       <div class="input-group">
         <i class="fa-solid fa-user main-icon"></i>
@@ -201,17 +221,21 @@
   }
 
   function initiateSuccess(res) {
-    // 1. Save to memory (Standard way)
     sessionStorage.setItem('userName', res.identity);
     sessionStorage.setItem('userPhoto', res.photoUrl || ""); 
 
     speak("Identity confirmed.");
 
-    // 2. REDIRECT WITH DATA IN URL (The "Suitcase" way)
-    // This ensures that even if sessionStorage fails, the name arrives
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('identityView').style.display = 'block';
+    document.getElementById('userName').innerText = res.identity.toUpperCase();
+    document.getElementById('user-photo').src = res.photoUrl || "https://via.placeholder.com/140";
+    
+    document.getElementById('loadFill').style.width = "100%";
+
     setTimeout(() => {
         window.location.href = "dashboard.html?name=" + encodeURIComponent(res.identity) + "&photo=" + encodeURIComponent(res.photoUrl || ""); 
-    }, 3000); 
+    }, 3500); 
 }
 </script>
 </body>
