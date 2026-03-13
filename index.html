@@ -1,242 +1,530 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <base target="_top">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>SYSTEM LOGIN</title>
-  
-  <link rel="icon" type="image/png" href="logo.png">
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
   <style>
-    :root { 
-      --accent: #00e5ff; 
-      --glass: rgba(0, 15, 20, 0.85); 
-      --red: #ff4444; 
-      --green: #00ff88; 
-      --bg: #030508;
-    }
-    
-    body { 
-      background: var(--bg); 
-      color: #fff; 
-      font-family: 'Outfit', sans-serif; 
-      margin: 0; 
-      height: 100vh; 
-      display: flex; 
-      justify-content: center; 
-      align-items: center; 
-      overflow: hidden; 
-      padding: 20px;
-      box-sizing: border-box;
-    }
+  :root {
+    --bg: #000; /* True black for matrix effect */
+    --alien-core: #00ff41; 
+    --alien-glow: rgba(0, 255, 65, 0.2);
+    --sidebar-width: 220px;
+    --collapsed-width: 55px;
+    --ease-logic: cubic-bezier(0.19, 1, 0.22, 1);
+    --error-red: #ff0000;
+  }
+  
+  * { ms-overflow-style: none; scrollbar-width: none; box-sizing: border-box; }
+  *::-webkit-scrollbar { display: none; }
 
-    /* --- BRANDING STYLE --- */
-    .brand-header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 25px;
-    }
+  body { 
+    font-family: 'Orbitron', sans-serif; 
+    background: var(--bg); 
+    margin: 0; 
+    display: flex; 
+    height: 100vh; 
+    color: var(--alien-core); 
+    overflow: hidden;
+  }
 
-    .login-logo {
-      height: 50px;
-      width: auto;
-      filter: drop-shadow(0 0 8px var(--accent));
-    }
+  /* SIDE PANEL */
+  .side-panel {
+    width: var(--collapsed-width);
+    height: 100%;
+    background: rgba(10, 12, 16, 0.98);
+    border-right: 1px solid var(--alien-glow);
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    z-index: 1000;
+    transition: width 0.4s var(--ease-logic);
+    overflow: hidden;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
 
-    /* --- ANIMATED BUTTERFLY BACKGROUND --- */
-    body::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath d='M50 50 c-10-20-40-20-40 0 c0 15 20 20 40 5 c20 15 40 10 40-5 c0-20-30-20-40 0' fill='none' stroke='%2300e5ff' stroke-width='0.5' opacity='0.3'%3E%3Canimate attributeName='d' dur='2s' repeatCount='indefinite' values='M50 50 c-10-20-40-20-40 0 c0 15 20 20 40 5 c20 15 40 10 40-5 c0-20-30-20-40 0; M50 50 c-5-20-10-20-10 0 c0 15 5 20 10 5 c5 15 10 10 10-5 c0-20-5-20-10 0; M50 50 c-10-20-40-20-40 0 c0 15 20 20 40 5 c20 15 40 10 40-5 c0-20-30-20-40 0'/%3E%3C/path%3E%3C/svg%3E");
-      background-size: 200px 200px;
-      z-index: -1;
-      animation: swarm-float 40s linear infinite;
-    }
+  .side-panel:hover {
+    width: var(--sidebar-width);
+    border-right: 1px solid var(--alien-core);
+  }
 
-    .terminal-card { 
-      background: var(--glass); 
-      backdrop-filter: blur(20px); 
-      border: 1px solid rgba(0, 229, 255, 0.4); 
-      border-radius: 20px; 
-      width: 100%;
-      max-width: 400px;
-      padding: 40px 30px; 
-      text-align: center; 
-      position: relative; 
-      box-shadow: 0 0 40px rgba(0, 229, 255, 0.15); 
-      z-index: 10; 
-      box-sizing: border-box;
-    }
-    
-    .shake { animation: shake 0.4s; }
-    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } }
+  .nav-scroll {
+    overflow-y: auto;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 0 8px;
+  }
 
-    .auth-success .login-view { display: none; }
-    .auth-success .identity-view { display: block; }
-    .identity-view { display: none; }
+  .cell { 
+    position: relative; 
+    width: 100%;
+    height: 38px;
+    cursor: pointer; 
+    transition: all 0.3s var(--ease-logic);
+  }
 
-    h2 { font-weight: 800; letter-spacing: 3px; text-transform: uppercase; font-size: 0.85rem; margin: 0; color: var(--accent); }
-    
-    .input-group { position: relative; margin-bottom: 15px; }
-    .input-group i.main-icon { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); opacity: 0.7; }
-    
-    .toggle-pass { 
-      position: absolute; 
-      right: 15px; 
-      top: 50%; 
-      transform: translateY(-50%); 
-      color: var(--accent); 
-      opacity: 0.5; 
-      cursor: pointer; 
-      transition: opacity 0.3s;
-      z-index: 5;
-    }
-    .toggle-pass:hover { opacity: 1; }
+  .cell-inner {
+    height: 100%;
+    display: flex; align-items: center;
+    padding-left: 10px;
+    background: rgba(255,255,255,0.03);
+    clip-path: polygon(0 0, 88% 0, 100% 50%, 88% 100%, 0 100%);
+  }
 
-    .input-box { width: 100%; background: rgba(0,0,0,0.7); border: 1px solid rgba(0,229,255,0.3); border-radius: 5px; padding: 15px 45px 15px 45px; color: #fff; box-sizing: border-box; outline: none; font-family: 'JetBrains Mono'; font-size: 16px; }
-    
-    .btn { width: 100%; padding: 18px; border-radius: 5px; border: none; background: var(--accent); color: #000; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: 0.4s; margin-top: 10px; }
-    .btn:active { transform: scale(0.98); opacity: 0.8; }
+  .cell:hover .cell-inner, .cell.active .cell-inner {
+    background: var(--alien-glow);
+    filter: brightness(1.2);
+    border-left: 3px solid var(--alien-core);
+  }
 
-    .vetting-container { display: none; margin-top: 20px; text-align: left; }
-    .vetting-bar { width: 100%; height: 4px; background: rgba(0, 229, 255, 0.1); border-radius: 2px; overflow: hidden; margin-top: 5px; }
-    .vetting-fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width 0.5s ease; }
+  .cell.selecting { transform: scale(0.85); opacity: 0.7; filter: hue-rotate(90deg); }
 
-    #alertModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
-    .modal-content { background: #110000; border: 2px solid var(--red); width: 100%; max-width: 300px; padding: 30px; text-align: center; box-shadow: 0 0 50px rgba(255,0,0,0.4); }
+  .icon { font-size: 18px; min-width: 35px; text-align: center; filter: drop-shadow(0 0 5px var(--alien-core)); }
+  .label { 
+    font-family: 'Share Tech Mono', monospace; 
+    font-size: 9px; 
+    color: #fff; 
+    letter-spacing: 1px;
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin-left: 12px;
+  }
+  .side-panel:hover .label { opacity: 1; }
 
-    .photo-frame { width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 20px; border: 2px solid var(--accent); overflow: hidden; background: #000; }
-    #user-photo { width: 100%; height: 100%; object-fit: cover; }
-    .loading-bar-fill { width: 0%; height: 100%; background: var(--green); transition: width 3.5s linear; }
+  /* MAIN CONTENT AREA */
+  .main-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: #000;
+    overflow: hidden;
+  }
 
-    @keyframes swarm-float { from { background-position: 0 0; } to { background-position: 600px 1200px; } }
+  .top-hud {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    background: rgba(0,0,0,0.8);
+    border-bottom: 1px solid rgba(0, 255, 65, 0.2);
+    font-family: 'Share Tech Mono';
+    font-size: 10px;
+    letter-spacing: 2px;
+    z-index: 10;
+  }
+
+  #display-viewport {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: transparent;
+  }
+
+  /* --- MODIFIED: MATRIX LANDING SCREEN --- */
+  .landing-screen {
+    position: absolute;
+    inset: 40px 0 0 0;
+    z-index: 5;
+    background: #000;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* The canvas for the matrix effect */
+  #matrix-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.8; /* Slightly faded so text is readable */
+  }
+
+  /* Container for the text overlay */
+  .matrix-overlay {
+    position: relative;
+    z-index: 6; /* Sit above the canvas */
+    background: rgba(0, 0, 0, 0.85); /* Dark box for readability */
+    border: 1px solid var(--alien-glow);
+    padding: 40px;
+    box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+    text-align: center;
+    width: 80%;
+    max-width: 500px;
+  }
+
+  .system-title {
+    font-size: 18px;
+    letter-spacing: 12px;
+    margin: 0;
+    color: #fff;
+    text-shadow: 0 0 10px var(--alien-core);
+  }
+
+  .system-status {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    color: var(--alien-core);
+    text-align: left;
+    margin-top: 20px;
+  }
+
+  @keyframes pulse {
+    0% { opacity: 0.4; }
+    50% { opacity: 1; }
+    100% { opacity: 0.4; }
+  }
+
+  /* SYNCHRONIZED LOADING PORTAL */
+  #portal { 
+    display: none; 
+    position: absolute; 
+    inset: 40px 0 0 0; 
+    background: rgba(5, 7, 10, 0.98); 
+    z-index: 9999; 
+    flex-direction: column; 
+    justify-content: center; 
+    align-items: center;
+    backdrop-filter: blur(10px);
+    transition: opacity 0.4s ease;
+  }
+
+  .processing-tag {
+    font-family: 'Share Tech Mono';
+    font-size: 14px;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    color: var(--alien-core);
+    text-shadow: 0 0 10px var(--alien-core);
+  }
+
+  .p-container { width: 300px; height: 4px; background: rgba(0, 255, 65, 0.05); border: 1px solid var(--alien-glow); }
+  .p-bar { width: 0%; height: 100%; background: var(--alien-core); box-shadow: 0 0 15px var(--alien-core); transition: width 0.3s ease-out; }
+
+  .exit-node-hud {
+    background: rgba(255, 0, 0, 0.1);
+    border: 1px solid var(--error-red);
+    color: var(--error-red);
+    cursor: pointer;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 9px;
+    padding: 3px 12px;
+    letter-spacing: 1px;
+    transition: all 0.3s var(--ease-logic);
+    clip-path: polygon(10% 0, 100% 0, 90% 100%, 0 100%);
+  }
+
+  .exit-node-hud:hover {
+    background: var(--error-red);
+    color: #fff;
+    box-shadow: 0 0 10px var(--error-red);
+  }
+
+  /* USER PROFILE STYLING */
+  .user-profile {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-right: 15px;
+    border-right: 1px solid rgba(0, 255, 65, 0.2);
+    margin-right: 10px;
+  }
+
+  .user-name {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 10px;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .user-photo {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: 1px solid var(--alien-core);
+    object-fit: cover;
+    box-shadow: 0 0 8px var(--alien-glow);
+  }
   </style>
 </head>
-<body onkeypress="handleKeyPress(event)">
+<body onclick="kickstartVoice()">
 
-  <div id="alertModal">
-    <div class="modal-content">
-      <i class="fa-solid fa-triangle-exclamation"></i>
-      <h3>SECURITY BREACH</h3>
-      <p id="modal-msg" style="font-size: 0.8rem;">INVALID ACCESS KEY</p>
-      <button class="close-btn" onclick="closeModal()" style="background:var(--red); color:white; border:none; padding:10px; width:100%; cursor:pointer;">Dismiss</button>
+  <div class="side-panel">
+    <div class="nav-scroll">
+      <div class="cell" onclick="nav('plantilla', this)"><div class="cell-inner"><div class="icon">📋</div><div class="label">PLANTILLA</div></div></div>
+      <div class="cell" onclick="nav('p_summary', this)"><div class="cell-inner"><div class="icon">📊</div><div class="label">P-SUMMARY</div></div></div>
+      <div class="cell" onclick="nav('sil', this)"><div class="cell-inner"><div class="icon">🗓️</div><div class="label">SIL SYSTEM</div></div></div>
+      <div class="cell" onclick="nav('reshuffle', this)"><div class="cell-inner"><div class="icon">🔄</div><div class="label">RESHUFFLE</div></div></div>
+      <div class="cell" onclick="nav('vcode', this)"><div class="cell-inner"><div class="icon">🔑</div><div class="label">VCODE MASTER</div></div></div>
+      <div class="cell" onclick="nav('buffer', this)"><div class="cell-inner"><div class="icon">🧮</div><div class="label">+5% BUFFER</div></div></div>
+      <div class="cell" onclick="nav('vacancy_mon', this)"><div class="cell-inner"><div class="icon">🔭</div><div class="label">VACANCIES</div></div></div>
+      <div class="cell" onclick="nav('emploc_mon', this)"><div class="cell-inner"><div class="icon">👤</div><div class="label">HR EMPLOC</div></div></div>
+      <div class="cell" onclick="nav('vcode_var', this)"><div class="cell-inner"><div class="icon">⚠️</div><div class="label">VARIANCE</div></div></div>
+      <div class="cell" onclick="nav('deactivation', this)"><div class="cell-inner"><div class="icon">🗑️</div><div class="label">DEACTIVATE</div></div></div>
+      <div class="cell" onclick="nav('approval', this)"><div class="cell-inner"><div class="icon">✅</div><div class="label">APPROVALS</div></div></div>
+      <div class="cell" onclick="nav('attrition', this)"><div class="cell-inner"><div class="icon">➡️</div><div class="label">ATTRITION</div></div></div>
     </div>
   </div>
 
-  <div class="terminal-card" id="mainCard">
-    <div class="login-view" id="loginView">
+  <div class="main-content">
+    <div class="top-hud">
+      <div style="color: #fff; cursor:pointer" onclick="location.reload()">GROUP 1 SYSTEM_DATABASE</div>
       
-      <div class="brand-header">
-        <h2><b>DATABASE SYSTEM ACCESS</b></h2>
-      </div>
-      
-      <div class="input-group">
-        <i class="fa-solid fa-user main-icon"></i>
-        <input type="text" id="user" class="input-box" placeholder="USERNAME" autocomplete="off">
-      </div>
-      
-      <div class="input-group">
-        <i class="fa-solid fa-shield-halved main-icon"></i>
-        <input type="password" id="pass" class="input-box" placeholder="ACCESS KEY">
-        <i class="fa-solid fa-eye toggle-pass" id="eyeIcon" onclick="toggleView()"></i>
-      </div>
-
-      <button class="btn" id="loginBtn" onclick="runAuth()">CONNECT</button>
-      
-      <div class="vetting-container" id="vettingBox">
-        <div style="font-size: 10px; font-family: 'JetBrains Mono'; color: var(--accent);">CONNECTING...</div>
-        <div class="vetting-bar"><div class="vetting-fill" id="vettingFill"></div></div>
+      <div style="display: flex; align-items: center; gap: 15px;">
+        <div class="user-profile" id="user-display" style="display: none;">
+          <span class="user-name" id="user-name-label">CONNECTING...</span>
+          <img src="" class="user-photo" id="user-photo-img" alt="User">
+        </div>
+        
+        <div id="active-node" style="color: var(--alien-core);">STATUS: STANDBY</div>
+        <button class="exit-node-hud" onclick="terminateSession()">LOGOUT</button>
       </div>
     </div>
 
-    <div class="identity-view" id="identityView">
-      <div class="photo-frame"><img src="" id="user-photo"></div>
-      <div id="greeting-text" style="font-size: 0.7rem; color: var(--green); letter-spacing: 2px; font-weight: 600;">ACCESS GRANTED</div>
-      <div class="id-name" id="userName" style="font-size: 1.2rem; font-weight: 600; color: var(--accent); margin-top: 5px; margin-bottom: 5px;">---</div>
-      <div style="height:4px; background:rgba(255,255,255,0.1); width:100%;"><div class="loading-bar-fill" id="loadFill" style="height:100%; background:var(--green); width:0%;"></div></div>
+  <div class="landing-screen" id="landing" style="display: flex; align-items: center; justify-content: center;">
+    <canvas id="matrix-canvas"></canvas>
+
+    <div class="matrix-overlay" style="display: flex; flex-direction: column; align-items: center; justify-content: center; width: 90%; max-width: 600px;">
+      <h2 class="system-title" style="text-align: center; margin-bottom: 10px;">SYSTEM_DIAGNOSTICS</h2>
+      <div style="width: 100%; height: 1px; background: var(--alien-glow); margin: 15px 0;"></div>
       
-      <button id="manualRedirectBtn" style="display:none; width:100%; margin-top:20px; background:var(--accent); border:none; color:#000; padding:15px; cursor:pointer; font-weight:bold; border-radius:4px;">LAUNCH SYSTEM DATABASE</button>
-      <div id="status-sub" style="font-size: 0.65rem; opacity: 0.6; margin-top: 15px;">REDIRECTING TO TERMINAL...</div>
+      <div class="system-status" style="width: 100%;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; border-bottom: 1px solid var(--alien-glow); padding-bottom: 20px;">
+          
+          <div style="border-left: 2px solid var(--alien-core); padding-left: 10px;">
+            <div style="font-size: 8px; color: rgba(255,255,255,0.4);">REQUISITION_01</div>
+            <div style="font-size: 10px;">> UPDATE VACANCY</div>
+          </div>
+
+          <div style="border-left: 2px solid var(--alien-core); padding-left: 10px;">
+            <div style="font-size: 8px; color: rgba(255,255,255,0.4);">BUFFER_CALC</div>
+            <div style="font-size: 10px;">> FIX +-5% BUFFER</div>
+          </div>
+
+          <div style="border-left: 2px solid var(--alien-core); padding-left: 10px;">
+            <div style="font-size: 8px; color: rgba(255,255,255,0.4);">UI_ACTION</div>
+            <div style="font-size: 10px;">> NEWLY HIRED BTN</div>
+          </div>
+
+          <div style="border-left: 2px solid var(--alien-core); padding-left: 10px;">
+            <div style="font-size: 8px; color: rgba(255,255,255,0.4);">DATE_SYNC</div>
+            <div style="font-size: 10px;">> CHECK VACANT DATE</div>
+          </div>
+
+          <div style="border-left: 2px solid var(--alien-core); padding-left: 10px;">
+            <div style="font-size: 8px; color: rgba(255,255,255,0.4);">REMARKS_LOG</div>
+            <div style="font-size: 10px;">> VACANCY REMARKS</div>
+          </div>
+
+          <div style="border-left: 2px solid var(--alien-core); padding-left: 10px;">
+            <div style="font-size: 8px; color: rgba(255,255,255,0.4);">HR_EMPLOC</div>
+            <div style="font-size: 10px;">> UPDATE REMARKS</div>
+          </div>
+        </div>
+
+        <div style="display: flex; justify-content: center; margin-top: 20px;">
+          <div style="width: fit-content; border: 1px dashed var(--alien-glow); padding: 10px 25px; background: rgba(0, 255, 65, 0.05); backdrop-filter: blur(2px);">
+            <div style="color: #fff; text-align: center; animation: pulse 1.5s infinite; letter-spacing: 2px; font-family:'Orbitron'; font-size: 9px;">
+              [ SELECT_MODULE FROM SIDE PANEL ]
+            </div>
+            <div style="height: 1px; background: var(--alien-glow); margin: 8px 0;"></div>
+            <div style="font-family: 'Share Tech Mono'; font-size: 9px; text-align: center; color: var(--alien-core); letter-spacing: 1px; opacity: 0.8;">
+              DEVELOPED BY: <span style="color: #fff; font-weight: bold;">ERTH</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 
-<script>
-  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyIVWTHt6ZBgjrBIB2In4JwkZrrPm9shK0qk4Q29nU6Umj-VFEM5YI10jaeiaCAgRrwmQ/exec"; 
+    <iframe id="display-viewport" name="viewport"></iframe>
 
-  function speak(text) {
-    if (!window.speechSynthesis) return;
-    const msg = new SpeechSynthesisUtterance(text);
-    msg.pitch = 1.3;
-    msg.rate = 0.95;
-    window.speechSynthesis.speak(msg);
-  }
+    <div id="portal">
+      <div class="processing-tag" id="p-status">ESTABLISHING_LINK</div>
+      <div class="p-container">
+        <div class="p-bar" id="p-bar"></div>
+      </div>
+      <div id="p-text" style="font-family:'Share Tech Mono'; font-size: 10px; color: var(--alien-glow); margin-top: 15px;">REQUESTING DATA PACKETS...</div>
+    </div>
+  </div>
 
-  function toggleView() {
-    const p = document.getElementById('pass');
-    const icon = document.getElementById('eyeIcon');
-    if (p.type === "password") {
-      p.type = "text";
-      icon.classList.replace('fa-eye', 'fa-eye-slash');
-      speak("Visualizing encrypted key.");
-    } else {
-      p.type = "password";
-      icon.classList.replace('fa-eye-slash', 'fa-eye');
-    }
-  }
+  <script>
+    // --- NEW: MATRIX RAIN SCRIPT ---
+    function initMatrixRain() {
+      const canvas = document.getElementById('matrix-canvas');
+      const ctx = canvas.getContext('2d');
 
-  function handleKeyPress(e) { if (e.keyCode === 13) { runAuth(); } }
-  function closeModal() { document.getElementById('alertModal').style.display = 'none'; }
+      // Set canvas to cover the viewport area (main-content size minus HUD)
+      const container = document.getElementById('landing');
+      canvas.width = container.offsetWidth;
+      canvas.height = container.offsetHeight;
 
-  function runAuth() {
-    const u = document.getElementById('user').value;
-    const p = document.getElementById('pass').value;
-    if(!u || !p) return;
+      // Matrix characters (Katakana, Latin, Numbers)
+      const characters = "アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      const charArray = characters.split('');
 
-    document.getElementById('vettingBox').style.display = 'block';
-    document.getElementById('vettingFill').style.width = "85%";
-    speak("System standby. Verifying credentials.");
+      const fontSize = 14;
+      // Calculate how many columns we need based on font size and canvas width
+      const columns = canvas.width / fontSize;
 
-    fetch(`${WEB_APP_URL}?user=${encodeURIComponent(u)}&pass=${encodeURIComponent(p)}`)
-      .then(response => response.json())
-      .then(res => {
-        if(res.success) {
-          initiateSuccess(res);
-        } else {
-          document.getElementById('vettingBox').style.display = 'none';
-          document.getElementById('alertModal').style.display = 'flex';
-          document.getElementById('mainCard').classList.add('shake');
-          setTimeout(() => document.getElementById('mainCard').classList.remove('shake'), 400);
-          speak("Security breach detected. Access denied.");
+      // An array to store the current 'y' position of each column's rain drop
+      const drops = [];
+      // Initialize drops at the top of the screen (y=0)
+      for (let i = 0; i < columns; i++) {
+        drops[i] = 0; 
+      }
+
+      // Drawing function
+      function drawMatrix() {
+        // Semi-transparent black background creates the "trail" effect
+        ctx.fillStyle = "rgba(0, 0, 0, 0.05)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Set character style
+        ctx.fillStyle = "#00ff41"; // alien-core green
+        ctx.font = fontSize + "px 'Share Tech Mono'";
+
+        // Loop over each column drop
+        for (let i = 0; i < drops.length; i++) {
+          // Get a random character
+          const text = charArray[Math.floor(Math.random() * charArray.length)];
+          
+          // Draw character at (x, y). X = column index * fontSize. Y = current drop height * fontSize.
+          // We add fontSize to Y so it doesn't start off-screen.
+          ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+          // If drop reaches the bottom, or randomly reset it to the top to create gaps
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+
+          // Move the drop down for the next frame
+          drops[i]++;
         }
-      })
-      .catch(err => {
-        console.error(err);
-        speak("System error. Connection failed.");
+      }
+
+      // Run the draw function every 35 milliseconds (adjust speed here)
+      setInterval(drawMatrix, 35);
+
+      // Handle window resize so canvas remains full screen
+      window.addEventListener('resize', () => {
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+        // Re-initialize columns array on resize
+        const newColumns = canvas.width / fontSize;
+        for (let i = drops.length; i < newColumns; i++) {
+            drops[i] = 0;
+        }
       });
-  }
+    }
 
-  function initiateSuccess(res) {
-    sessionStorage.setItem('userName', res.identity);
-    sessionStorage.setItem('userPhoto', res.photoUrl || ""); 
+    // --- ORIGINAL SCRIPTS (With Matrix Init) ---
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    let synth = window.speechSynthesis;
+    let progressInterval;
 
-    speak("Identity confirmed.");
+    function speakAI(text) {
+      if (!synth) return;
+      synth.cancel();
+      const msg = new SpeechSynthesisUtterance(text.toUpperCase());
+      msg.rate = 1.4;
+      msg.pitch = 0.8;
+      synth.speak(msg);
+    }
 
-    document.getElementById('loginView').style.display = 'none';
-    document.getElementById('identityView').style.display = 'block';
-    document.getElementById('userName').innerText = res.identity.toUpperCase();
-    document.getElementById('user-photo').src = res.photoUrl || "https://via.placeholder.com/140";
-    
-    document.getElementById('loadFill').style.width = "100%";
+    function kickstartVoice() { if (audioCtx.state === 'suspended') audioCtx.resume(); }
 
-    setTimeout(() => {
-        window.location.href = "dashboard.html?name=" + encodeURIComponent(res.identity) + "&photo=" + encodeURIComponent(res.photoUrl || ""); 
-    }, 3500); 
-}
-</script>
+    function nav(page, element) {
+      document.querySelectorAll('.cell').forEach(c => c.classList.remove('active', 'selecting'));
+      element.classList.add('active', 'selecting');
+      const labelText = element.querySelector('.label').innerText;
+      document.getElementById('active-node').innerText = "SYSTEM_ " + labelText;
+      speakAI("Accessing " + labelText);
+
+      startSmartLoading();
+
+      google.script.run.withSuccessHandler(url => {
+        if (url) {
+          const viewport = document.getElementById('display-viewport');
+          viewport.onload = function() {
+            finishSmartLoading(element);
+            document.getElementById('landing').style.display = 'none';
+          };
+          viewport.src = url + "?page=" + page;
+        }
+      }).getAppUrl();
+    }
+
+    function startSmartLoading() {
+      const bar = document.getElementById('p-bar');
+      const portal = document.getElementById('portal');
+      const status = document.getElementById('p-status');
+      const subtext = document.getElementById('p-text');
+      portal.style.display = 'flex';
+      portal.style.opacity = '1';
+      bar.style.width = '0%';
+      let width = 0;
+      clearInterval(progressInterval);
+      progressInterval = setInterval(() => {
+        if (width >= 90) {
+          clearInterval(progressInterval);
+          status.innerText = "FINALIZING_ENCRYPTION";
+          subtext.innerText = "AWAITING_SERVER_HANDSHAKE...";
+        } else {
+          width += (90 - width) * 0.15;
+          bar.style.width = width + '%';
+          if (width < 30) status.innerText = "SYNCING_CORE";
+          else if (width < 60) status.innerText = "DECRYPTING_DATA";
+          else status.innerText = "MAPPING_NODES";
+          subtext.innerText = "STREAMING: " + Math.floor(width) + "%";
+        }
+      }, 60);
+    }
+
+    function finishSmartLoading(element) {
+      const bar = document.getElementById('p-bar');
+      const portal = document.getElementById('portal');
+      const status = document.getElementById('p-status');
+      status.innerText = "ACCESS_GRANTED";
+      bar.style.width = '100%';
+      setTimeout(() => {
+        portal.style.opacity = '0';
+        setTimeout(() => { 
+          portal.style.display = 'none'; 
+          element.classList.remove('selecting');
+        }, 400);
+      }, 300);
+    }
+
+    function terminateSession() {
+      speakAI("Deactivating session.");
+      window.top.location.href = "https://script.google.com/macros/s/AKfycbwOoiYogsn7fW6he8ImnheOOJnS0gdg1n1NQ_h9GPf3IopKWX4LnjfEDGotBa3b3sUI/exec";
+    }
+
+    // HANDSHAKE WITH SPREADSHEET FOR USER DATA & INIT MATRIX
+    window.addEventListener('load', function() {
+      // Initialize Matrix effect
+      initMatrixRain();
+
+      google.script.run.withSuccessHandler(function(user) {
+        if (user && user.name) {
+          document.getElementById('user-name-label').innerText = user.name;
+          document.getElementById('user-photo-img').src = user.photo || "https://www.w3schools.com/howto/img_avatar.png";
+          document.getElementById('user-display').style.display = 'flex';
+        }
+      }).getUserData();
+    });
+  </script>
 </body>
 </html>
