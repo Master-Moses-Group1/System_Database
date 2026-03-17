@@ -1,73 +1,313 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-    <style>
-      /* Add your CSS here for the sidebar and login page */
-      #dashboard { display: none; display: flex; }
-      .sidebar { width: 250px; background: #333; color: white; height: 100vh; }
-      .content { flex: 1; padding: 20px; }
-      .user-info { display: flex; align-items: center; gap: 10px; float: right; }
-      .user-photo { width: 40px; height: 40px; border-radius: 50%; }
-      .hidden { display: none !important; }
-    </style>
-  </head>
-  <body>
+<head>
+  <base target="_top">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&family=JetBrains+Mono:wght@300&display=swap" rel="stylesheet">
+  <style>
+    :root { 
+      --accent: #00e5ff; 
+      --glass: rgba(0, 15, 20, 0.9); 
+      --red: #ff4444; 
+      --green: #00ff88; 
+      --bg: #05070a;
+    }
+    
+    body { 
+      background: var(--bg); 
+      color: #fff; 
+      font-family: 'Outfit', sans-serif; 
+      margin: 0; 
+      height: 100vh; 
+      display: flex; 
+      justify-content: center; 
+      align-items: center; 
+      overflow: hidden; 
+      padding: 20px;
+      box-sizing: border-box;
+    }
 
-    <div id="login-section">
-      <h2>Login</h2>
-      <input type="text" id="email" placeholder="Email">
-      <input type="password" id="pass" placeholder="Password">
-      <button onclick="login()">Login</button>
+    /* Background FX */
+    body::before { content: ""; position: fixed; inset: -100% 0; background: linear-gradient(90deg, rgba(0, 229, 255, 0.03) 1px, transparent 1px), linear-gradient(rgba(0, 229, 255, 0.03) 1px, transparent 1px); background-size: 60px 60px; transform: perspective(400px) rotateX(60deg); z-index: -1; animation: grid-move 15s linear infinite; }
+    @keyframes grid-move { from { background-position: 0 0; } to { background-position: 0 100%; } }
+    body::after { content: ""; position: fixed; top: -100%; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent 0%, rgba(0, 229, 255, 0.08) 50%, transparent 100%); z-index: 1000; pointer-events: none; animation: scanline 8s linear infinite; }
+    @keyframes scanline { 0% { top: -100%; } 100% { top: 100%; } }
+
+    .terminal-card { 
+      background: var(--glass); 
+      backdrop-filter: blur(15px); 
+      border: 1px solid var(--accent); 
+      border-radius: 20px; 
+      width: 100%;
+      max-width: 400px;
+      padding: 40px 30px; 
+      text-align: center; 
+      position: relative; 
+      box-shadow: 0 0 30px rgba(0, 229, 255, 0.2); 
+      z-index: 10; 
+      box-sizing: border-box;
+    }
+    
+    .shake { animation: shake 0.4s; }
+    @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 50% { transform: translateX(10px); } 75% { transform: translateX(-10px); } }
+
+    .auth-success .login-view { display: none; }
+    .auth-success .identity-view { display: block; }
+    .identity-view { display: none; }
+
+    h2 { font-weight: 800; letter-spacing: 3px; text-transform: uppercase; font-size: 0.85rem; margin-bottom: 30px; color: var(--accent); }
+    
+    .input-group { position: relative; margin-bottom: 15px; }
+    .input-group i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: var(--accent); opacity: 0.7; }
+    .input-box { width: 100%; background: rgba(0,0,0,0.7); border: 1px solid rgba(0,229,255,0.3); border-radius: 5px; padding: 15px 15px 15px 45px; color: #fff; box-sizing: border-box; outline: none; font-family: 'JetBrains Mono'; font-size: 16px; }
+    
+    .btn { width: 100%; padding: 18px; border-radius: 5px; border: none; background: var(--accent); color: #000; font-weight: 600; text-transform: uppercase; letter-spacing: 3px; cursor: pointer; transition: 0.4s; margin-top: 10px; }
+    .btn:active { transform: scale(0.98); opacity: 0.8; }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 12px;
+      border-radius: 5px;
+      border: 1px solid rgba(0, 229, 255, 0.3);
+      background: transparent;
+      color: var(--accent);
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      cursor: pointer;
+      transition: 0.4s;
+      margin-top: 12px;
+      font-family: 'JetBrains Mono';
+      font-size: 0.7rem;
+    }
+    .btn-secondary:hover { background: rgba(0, 229, 255, 0.1); }
+
+    .vetting-container { display: none; margin-top: 20px; text-align: left; }
+    .vetting-bar { width: 100%; height: 4px; background: rgba(0, 229, 255, 0.1); border-radius: 2px; overflow: hidden; margin-top: 5px; }
+    .vetting-fill { width: 0%; height: 100%; background: var(--accent); box-shadow: 0 0 10px var(--accent); transition: width 0.5s ease; }
+
+    #alertModal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 9999; justify-content: center; align-items: center; padding: 20px; }
+    .modal-content { background: #110000; border: 2px solid var(--red); width: 100%; max-width: 300px; padding: 30px; text-align: center; box-shadow: 0 0 50px rgba(255,0,0,0.4); clip-path: polygon(10% 0, 100% 0, 100% 90%, 90% 100%, 0 100%, 0 10%); }
+    .modal-content i { font-size: 40px; color: var(--red); margin-bottom: 15px; animation: pulse-red 1s infinite; }
+    @keyframes pulse-red { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+    .modal-content h3 { font-family: 'JetBrains Mono'; color: var(--red); letter-spacing: 3px; margin: 10px 0; font-size: 1rem; }
+    .close-btn { background: var(--red); color: white; border: none; padding: 10px 25px; cursor: pointer; font-family: 'Outfit'; font-weight: bold; text-transform: uppercase; margin-top: 15px; width: 100%; }
+
+    .photo-frame { width: 140px; height: 140px; border-radius: 50%; margin: 0 auto 20px; border: 2px solid var(--accent); overflow: hidden; background: #000; box-shadow: 0 0 20px var(--accent); }
+    #user-photo { width: 100%; height: 100%; object-fit: cover; }
+    .loading-bar-container { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 20px; overflow: hidden; }
+    .loading-bar-fill { width: 0%; height: 100%; background: var(--green); transition: width 3.5s linear; }
+
+    @media (max-width: 480px) {
+      .terminal-card { padding: 35px 20px; }
+      h2 { font-size: 0.75rem; letter-spacing: 2px; }
+      .photo-frame { width: 120px; height: 120px; }
+    }
+  </style>
+</head>
+<body onkeypress="handleKeyPress(event)">
+
+  <div id="alertModal">
+    <div class="modal-content">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      <h3>SECURITY BREACH</h3>
+      <p id="modal-msg" style="font-size: 0.8rem;">INVALID ACCESS KEY</p>
+      <button class="close-btn" onclick="closeModal()">Dismiss</button>
     </div>
+  </div>
 
-    <div id="dashboard" class="hidden">
-      <div class="sidebar" id="sidebar-buttons">
-        </div>
+  <div class="terminal-card" id="mainCard">
+    <div class="login-view" id="loginView">
+      <h2><b>DATABASE SYSTEM ACCESS</b></h2>
+      <div class="input-group">
+        <i class="fa-solid fa-user"></i>
+        <input type="text" id="user" class="input-box" placeholder="USERNAME" autocomplete="off">
+      </div>
+      <div class="input-group">
+        <i class="fa-solid fa-shield-halved"></i>
+        <input type="password" id="pass" class="input-box" placeholder="ACCESS KEY">
+      </div>
+      <button class="btn" id="loginBtn" onclick="runAuth()">CONNECT</button>
       
-      <div class="content">
-        <nav>
-          <div class="user-info">
-            <img id="user-img" class="user-photo" src="">
-            <span id="user-name"></span>
-            <button onclick="logout()">Logout</button>
-          </div>
-        </nav>
-        <div id="main-display">
-          <h1>Welcome! Select an option from the sidebar.</h1>
-        </div>
+      <div class="vetting-container" id="vettingBox">
+        <div style="font-size: 10px; font-family: 'JetBrains Mono'; color: var(--accent);">CONNECTING...</div>
+        <div class="vetting-bar"><div class="vetting-fill" id="vettingFill"></div></div>
       </div>
     </div>
 
-    <script>
-  const allButtons = ["Plantilla", "Summary", "Payroll", "Leave", "Records"];
+    <div class="identity-view" id="identityView">
+      <div class="photo-frame"><img src="" id="user-photo"></div>
+      <div id="greeting-text" style="font-size: 0.7rem; color: var(--green); letter-spacing: 2px; font-weight: 600;">ACCESS GRANTED</div>
+      <div class="id-name" id="userName" style="font-size: 1.2rem; font-weight: 600; color: var(--accent); margin-top: 5px; margin-bottom: 5px;">---</div>
+      <div class="loading-bar-container"><div class="loading-bar-fill" id="loadFill"></div></div>
+      
+      <button id="manualRedirectBtn" 
+        onclick="voiceLaunch();"
+        onmouseover="speak('Launch system database')"
+        style="display:none; width:100%; margin-top:20px; background:var(--accent); border:none; color:#000; padding:15px; cursor:pointer; font-family:'JetBrains Mono'; font-weight:bold; border-radius:4px; text-transform:uppercase; font-size:0.8rem;">
+  LAUNCH SYSTEM DATABASE
+</button>
+      
+      <button class="btn-secondary" onclick="resetTerminal()">
+  <i class="fa-solid fa-arrow-left-long"></i> RETURN TO LOGIN
+</button>
+      
+      <div id="status-sub" style="font-size: 0.65rem; opacity: 0.6; margin-top: 15px; font-family: 'JetBrains Mono'; min-height: 1em;">REDIRECTING TO TERMINAL...</div>
+    </div>
+  </div>
 
-  // REPLACE YOUR OLD LOGIN FUNCTION WITH THIS:
-  function login() {
-    const email = document.getElementById('email').value;
-    const pass = document.getElementById('pass').value;
-    
-    // REPLACE THIS URL with your actual Apps Script Web App URL
-    const url = "https://script.google.com/macros/s/AKfycbx1WBIyuZqtwyfp_IxXeiqyEZNJZqlZa6LbAGFXgki36N8goOXjxyFJpAhKeUHGybFj/exec"; 
+<script>
+  let alarmInterval;
+  let currentSessionUser = ""; // Local variable to hold the username
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
-    fetch(url, {
-      method: "POST",
-      // This sends the data as a string to your Apps Script doPost(e) function
-      body: JSON.stringify({ email: email, pass: pass })
-    })
-    .then(res => res.json())
-    .then(response => {
-      if (response.status === "success") {
-        showDashboard(response);
-      } else {
-        alert("Invalid Credentials");
-      }
-    })
-    .catch(err => {
-      console.error("Error:", err);
-      alert("System Error: Could not connect to the database.");
-    });
+  function speak(text) {
+    if (!window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const msg = new SpeechSynthesisUtterance(text);
+    const voices = window.speechSynthesis.getVoices();
+    msg.voice = voices.find(v => v.name.includes('Female') || v.name.includes('Google US English')) || voices[0];
+    msg.rate = 0.9;
+    window.speechSynthesis.speak(msg);
   }
 
-  // Keep your showDashboard, loadContent, and logout functions below...
+  function handleKeyPress(e) { if (e.keyCode === 13) { runAuth(); } }
+
+  function playAlarm() {
+    alarmInterval = setInterval(() => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+      gain.gain.setValueAtTime(0.02, audioCtx.currentTime);
+      osc.connect(gain); gain.connect(audioCtx.destination);
+      osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+    }, 500);
+  }
+
+  function closeModal() { 
+    document.getElementById('alertModal').style.display = 'none'; 
+    clearInterval(alarmInterval); 
+  }
+
+  function runAuth() {
+    const u = document.getElementById('user').value;
+    const p = document.getElementById('pass').value;
+    if(!u || !p) return;
+
+    const vFill = document.getElementById('vettingFill');
+    document.getElementById('vettingBox').style.display = 'block';
+    vFill.style.width = "85%";
+    speak("CONNECTING TO SYSTEM.");
+
+    google.script.run.withSuccessHandler(res => {
+      if(res.success) {
+        currentSessionUser = res.identity; // Store the user identity
+        vFill.style.width = "100%";
+        const img = document.getElementById('user-photo');
+        if(res.photoUrl) {
+          img.src = res.photoUrl;
+          img.onload = () => initiateSuccess(res);
+          img.onerror = () => initiateSuccess(res);
+        } else { initiateSuccess(res); }
+      } else {
+        document.getElementById('vettingBox').style.display = 'none';
+        vFill.style.width = "0%";
+        document.getElementById('alertModal').style.display = 'flex';
+        document.getElementById('mainCard').classList.add('shake');
+        setTimeout(() => document.getElementById('mainCard').classList.remove('shake'), 400);
+        playAlarm();
+        speak("Access denied.");
+      }
+    }).checkLogin(u, p);
+  }
+
+  function getTimeGreeting() {
+    const hour = new Date().getHours();
+    if (hour < 12) return "Good morning";
+    if (hour < 18) return "Good afternoon";
+    return "Good evening";
+  }
+
+  /**
+   * IMPORTANT: This is the function you should use for your hexagonal dashboard buttons.
+   * Call it like this: navigateTo('PLANTILLA', 'https://your-url.com')
+   */
+  function navigateTo(buttonName, targetUrl) {
+    if (currentSessionUser) {
+        google.script.run.logActivity(currentSessionUser, buttonName);
+    }
+    window.top.location.href = targetUrl;
+  }
+
+  function initiateSuccess(res) {
+    const userName = document.getElementById('userName');
+    const loadFill = document.getElementById('loadFill');
+    const manualBtn = document.getElementById('manualRedirectBtn');
+    const statusSub = document.getElementById('status-sub');
+    const timeGreeting = getTimeGreeting();
+    const identityName = res.identity || "OPERATOR";
+
+    document.getElementById('mainCard').classList.add('auth-success');
+    userName.innerText = identityName;
+
+    // Log the initial entry to the individual sheet
+    google.script.run.logActivity(identityName, "INITIAL_PORTAL_ENTRY");
+
+    speak(`${timeGreeting}, ${identityName}. Access granted. Initializing terminal.`);
+
+    setTimeout(() => { loadFill.style.width = "100%"; }, 100);
+
+    const messages = ["ESTABLISHING UPLINK...", "BYPASSING FIREWALLS...", "DECRYPTING PANEL..."];
+    let msgIdx = 0;
+    const msgInterval = setInterval(() => {
+      if(msgIdx < messages.length) {
+        statusSub.innerText = messages[msgIdx];
+        msgIdx++;
+      } else { clearInterval(msgInterval); }
+    }, 1200);
+
+    // Set up manual button redirect
+    manualBtn.onclick = function() { 
+        navigateTo('MANUAL_PORTAL_LAUNCH', res.url);
+    };
+
+    setTimeout(() => {
+      if (res.url) {
+        statusSub.innerText = "";
+        statusSub.style.color = "var(--green)";
+        try {
+          // Automatic redirect after 4.2s
+          navigateTo('AUTO_PORTAL_REDIRECT', res.url);
+        } catch (e) {
+          manualBtn.style.display = "block";
+        }
+      } else {
+        statusSub.innerText = "CRITICAL ERROR: URL NOT FOUND";
+        statusSub.style.color = "var(--red)";
+      }
+    }, 4200); 
+  }
+
+  function voiceLaunch() {
+    speak("Initializing uplink. Accessing database.");
+    const panelUrl = document.getElementById('manualRedirectBtn').dataset.url;
+    setTimeout(() => {
+      if (panelUrl) {
+        navigateTo('VOICE_COMMAND_LAUNCH', panelUrl);
+      }
+    }, 1500);
+  }
+
+  function resetTerminal() {
+    speak("Session terminated. RETURN TO LOGIN.");
+    google.script.run
+      .withSuccessHandler(function(url) {
+        window.open(url, '_top');
+      })
+      .getServiceUrl();
+  }
 </script>
+</body>
+</html>
