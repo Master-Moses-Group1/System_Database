@@ -1,0 +1,5 @@
+**/**
+!Code.js
+!Index.html
+!appsscript.json
+!*.html
